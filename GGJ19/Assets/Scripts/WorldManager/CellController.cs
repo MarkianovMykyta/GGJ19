@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.AI;
 using System.Collections;
 
 public class CellController : MonoBehaviour
@@ -8,6 +9,9 @@ public class CellController : MonoBehaviour
     public CellController RightCell;
     public CellController TopCell;
     public CellController BottomCell;
+
+    [SerializeField]
+    private NavMeshSurface _navMechSurface;
 
     public int tempValue;
 
@@ -37,4 +41,12 @@ public class CellController : MonoBehaviour
         tempValue = -1;
         Empty = empty;
     }
+
+    [ContextMenu("Generate NavMesh")]
+    private void GenerateNavMesh()
+    {
+        _navMechSurface.BuildNavMesh();
+    }
+
+
 }

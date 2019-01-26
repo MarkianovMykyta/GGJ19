@@ -18,9 +18,16 @@ public class WorldManager : MonoBehaviour
     [SerializeField]
     private CellController _cellTemplate;
 
+    [SerializeField]
+    private FloatVariable _loadingProgress;
+    [SerializeField]
+    private EventController _onWorldReadyEvent;
+    [SerializeField]
+    private Home _home;
+
     private CellController[,] _cellsArr;
     private List<ZoneController> _zones;
-
+    
     [ContextMenu("Generate World")]
     public void GenerateWorld()
     {
@@ -54,7 +61,6 @@ public class WorldManager : MonoBehaviour
                         _cellsArr[x, y].LeftCell = _cellsArr[x - 1, y];
                         _cellsArr[x - 1, y].RightCell = _cellsArr[x, y];
                     }
-
                 }
                 if (y > 0)
                 {
@@ -66,24 +72,34 @@ public class WorldManager : MonoBehaviour
                 }
             }
 
+            _loadingProgress.Value = 0.3f / (_worldSize - x);
             yield return new WaitForEndOfFrame();
         }
 
         yield return CreateZones();
+        _loadingProgress.Value = 0.5f;
         yield return FixZones();
-
         ConnectCollidingZones();
+        _loadingProgress.Value = 0.6f;
 
         bool success = AllZonesConnected();
+        _loadingProgress.Value = 1f;
         if (success)
         {
             foreach(var zone in _zones)
             {
                 zone.SetColor();
             }
-        }
 
-        Debug.Log(success);
+            _home.Position = new Vector3(_worldSize * _cellSize / 2f, 5, _worldSize * _cellSize / 2f);
+
+            _onWorldReadyEvent.Activate();
+            Debug.Log("World Ready!");
+        }
+        else
+        {
+            Debug.LogError("World Generation Error!");
+        }
     }
 
     private IEnumerator CreateZones()
