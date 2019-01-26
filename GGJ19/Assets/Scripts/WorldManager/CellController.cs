@@ -9,6 +9,8 @@ public class CellController : MonoBehaviour
     public CellController TopCell;
     public CellController BottomCell;
 
+    public int tempValue;
+
     private bool _empty;
 
     public bool Empty
@@ -21,13 +23,18 @@ public class CellController : MonoBehaviour
         {
             _empty = value;
             gameObject.SetActive(!_empty);
+
+            if (_empty)
+            {
+                ZoneID = -1;
+            }
         }
     }
 
     public void Init(bool empty)
     {
         ZoneID = -1;
-
+        tempValue = -1;
         Empty = empty;
     }
 }

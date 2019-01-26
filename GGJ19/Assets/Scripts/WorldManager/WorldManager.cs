@@ -12,6 +12,8 @@ public class WorldManager : MonoBehaviour
     private int _maxZoneSize;
     [SerializeField]
     private int _minZoneSize;
+    [SerializeField]
+    private int _homeSize;
 
     [SerializeField]
     private CellController _cellTemplate;
@@ -67,16 +69,46 @@ public class WorldManager : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
-        CreateZones();
-        FixZones();
-        ConnectZones();
+        yield return CreateZones();
+        yield return FixZones();
+
+        ConnectCollidingZones();
+
+        bool success = AllZonesConnected();
+        if (success)
+        {
+            foreach(var zone in _zones)
+            {
+                zone.SetColor();
+            }
+        }
+
+        Debug.Log(success);
     }
 
-    private void CreateZones()
+    private IEnumerator CreateZones()
     {
         _zones = new List<ZoneController>();
 
         int idCounter = 0;
+
+        ZoneController zone = new ZoneController();
+        zone.ZoneID = idCounter;
+        _zones.Add(zone);
+
+        for (int i = _worldSize / 2 - _homeSize / 2; i <= _worldSize / 2 + _homeSize / 2; i++)
+        {
+            for (int j = _worldSize / 2 - _homeSize / 2; j <= _worldSize / 2 + _homeSize / 2; j++)
+            {
+                _cellsArr[i, j].ZoneID = idCounter;
+                _cellsArr[i, j].Empty = false;
+
+                zone.Cells.Add(_cellsArr[i, j]);
+            }
+        }
+
+        idCounter++;
+
         for (int x = 0; x < _worldSize; x++)
         {
             for (int y = 0; y < _worldSize; y++)
@@ -84,7 +116,7 @@ public class WorldManager : MonoBehaviour
                 CellController cell = _cellsArr[x, y];
                 if (cell == null || cell.Empty || cell.ZoneID >= 0) continue;
 
-                ZoneController zone = new ZoneController();
+                zone = new ZoneController();
                 zone.ZoneID = idCounter;
 
                 SetZone(idCounter, cell, zone, 0);
@@ -94,6 +126,8 @@ public class WorldManager : MonoBehaviour
                 _zones.Add(zone);
 
                 idCounter++;
+
+                yield return new WaitForEndOfFrame();
             }
         }
     }
@@ -124,7 +158,7 @@ public class WorldManager : MonoBehaviour
         }
     }
 
-    private void FixZones()
+    private IEnumerator FixZones()
     {
         for (int i = _zones.Count - 1; i >= 0; i--)
         {
@@ -133,76 +167,28 @@ public class WorldManager : MonoBehaviour
                 _zones[i].DestroyZone();
                 _zones.Remove(_zones[i]);
             }
+
+            yield return new WaitForEndOfFrame();
         }
     }
 
-    private void ConnectZones()
+    private void ConnectCollidingZones()
     {
         for (int x = 0; x < _worldSize; x++)
         {
             for (int y = 0; y < _worldSize; y++)
             {
                 CellController cell = _cellsArr[x, y];
-                if (!cell.Empty)
-                {
-                    if(cell.RightCell != null && cell.ZoneID != cell.RightCell.ZoneID)
-                    {
-                        //var zone1 = _zones.Find(zx => x.ZoneID == cell1.ZoneID);
-                        //var zone2 = _zones.Find(x => x.ZoneID == cell2.ZoneID);
 
-                        //if (zone1 == null || zone2 == null) return false;
-                        //if (zone1.Neighbors.Contains(zone2)) return false;
-
-                        //zone1.Neighbors.Add(zone2);
-                        //zone2.Neighbors.Add(zone1);
-                    }
-                }
-            }
-        }
-
-        for (int x = 0; x < _worldSize; x++)
-        {
-            for (int y = 0; y < _worldSize; y++)
-            {
-                CellController cell = _cellsArr[x, y];
-                if (cell.Empty)
-                {
-                    if (ConnectCells(cell.RightCell, cell.LeftCell))
-                    {
-                        cell.Empty = false;
-                        continue;
-                    }
-                    if (ConnectCells(cell.RightCell, cell.TopCell))
-                    {
-                        cell.Empty = false;
-                        continue;
-                    }
-                    if (ConnectCells(cell.RightCell, cell.BottomCell))
-                    {
-                        cell.Empty = false;
-                        continue;
-                    }
-                    if (ConnectCells(cell.LeftCell, cell.TopCell))
-                    {
-                        cell.Empty = false;
-                        continue;
-                    }
-                    if (ConnectCells(cell.LeftCell, cell.BottomCell))
-                    {
-                        cell.Empty = false;
-                        continue;
-                    }
-                    if (ConnectCells(cell.TopCell, cell.BottomCell))
-                    {
-                        cell.Empty = false;
-                        continue;
-                    }
-                }
+                ConnectCells(cell, cell.RightCell);
+                ConnectCells(cell, cell.LeftCell);
+                ConnectCells(cell, cell.TopCell);
+                ConnectCells(cell, cell.BottomCell);
             }
         }
     }
 
-    private bool ConnectCells(CellController cell1, CellController cell2)
+    private void ConnectCells(CellController cell1, CellController cell2)
     {
         if (cell1 != null && cell2 != null)
         {
@@ -213,18 +199,251 @@ public class WorldManager : MonoBehaviour
                     var zone1 = _zones.Find(x => x.ZoneID == cell1.ZoneID);
                     var zone2 = _zones.Find(x => x.ZoneID == cell2.ZoneID);
 
-                    if (zone1 == null || zone2 == null) return false;
-                    if (zone1.Neighbors.Contains(zone2)) return false;
+                    if (zone1 == null || zone2 == null) return;
+                    if (zone1.Neighbors.Contains(zone2)) return;
 
                     zone1.Neighbors.Add(zone2);
                     zone2.Neighbors.Add(zone1);
+                }
+            }
+        }
+    }
 
-                    return true;
+    private bool AllZonesConnected()
+    {
+        List<int> ids = new List<int>();
+        var zone = _zones[0];
+
+        CheckZone(zone, ids);
+
+        int counter = 100 * _worldSize;
+        while (ids.Count != _zones.Count)
+        {
+            FindNewConnection(ids);
+
+            ids = new List<int>();
+            CheckZone(zone, ids);
+            ConnectCollidingZones();
+
+            if (--counter == 0)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void CheckZone(ZoneController zone, List<int> ids)
+    {
+        ids.Add(zone.ZoneID);
+
+        foreach (var connectedZone in zone.Neighbors)
+        {
+            if (ids.Contains(connectedZone.ZoneID)) continue;
+
+            CheckZone(connectedZone, ids);
+        }
+    }
+
+    private void FindNewConnection(List<int> ids)
+    {
+        foreach (var id in ids)
+        {
+            var zone = _zones.Find(z => z.ZoneID == id);
+            SetFirstTempValues(zone);
+        }
+
+        var newCell = SearchNewCell(ids);
+
+        if (newCell != null)
+        {
+            var newZone = _zones.Find(z => z.ZoneID == newCell.ZoneID);
+
+            CreateConnection(newCell, newZone);
+        }
+    }
+
+    private void SetFirstTempValues(ZoneController zone)
+    {
+        foreach (var cell in zone.Cells)
+        {
+            if (cell.LeftCell != null && cell.LeftCell.Empty)
+            {
+                if (cell.tempValue < 0)
+                {
+                    cell.LeftCell.tempValue = 0;
+                }
+            }
+            if (cell.RightCell != null && cell.RightCell.Empty)
+            {
+                if (cell.tempValue < 0)
+                {
+                    cell.RightCell.tempValue = 0;
+                }
+            }
+            if (cell.TopCell != null && cell.TopCell.Empty)
+            {
+                if (cell.tempValue < 0)
+                {
+                    cell.TopCell.tempValue = 0;
+                }
+            }
+            if (cell.BottomCell != null && cell.BottomCell.Empty)
+            {
+                if (cell.tempValue < 0)
+                {
+                    cell.BottomCell.tempValue = 0;
+                }
+            }
+        }
+    }
+
+    private CellController SearchNewCell(List<int> ids)
+    {
+        for (int i = 0; i < 100 * _worldSize; i++)
+        {
+            for (int x = 0; x < _worldSize; x++)
+            {
+                for (int y = 0; y < _worldSize; y++)
+                {
+                    var cell = _cellsArr[x, y];
+
+                    if (cell.tempValue >= 0)
+                    {
+                        var targetCell = CheckNearCell(cell.LeftCell, cell, ids);
+                        if (targetCell != null) return targetCell;
+
+                        targetCell = CheckNearCell(cell.RightCell, cell, ids);
+                        if (targetCell != null) return targetCell;
+
+                        targetCell = CheckNearCell(cell.TopCell, cell, ids);
+                        if (targetCell != null) return targetCell;
+
+                        targetCell = CheckNearCell(cell.BottomCell, cell, ids);
+                        if (targetCell != null) return targetCell;
+                    }
                 }
             }
         }
 
-        return false;
+        return null;
+    }
+
+    private CellController CheckNearCell(CellController nearCell, CellController cell, List<int> ids)
+    {
+        if (nearCell != null)
+        {
+            if (nearCell.Empty)
+            {
+                if (nearCell.tempValue < 0)
+                {
+                    nearCell.tempValue = cell.tempValue + 1;
+                }
+            }
+            else
+            {
+                if (!ids.Contains(nearCell.ZoneID))
+                {
+                    nearCell.tempValue = cell.tempValue + 1;
+                    return nearCell;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private void ClearTempValues()
+    {
+        for (int x = 0; x < _worldSize; x++)
+        {
+            for (int y = 0; y < _worldSize; y++)
+            {
+                _cellsArr[x, y].tempValue = -1;
+            }
+        }
+    }
+
+    private void CreateConnection(CellController cell, ZoneController zone)
+    {
+        for (int i = 0; i < 100 * _worldSize; i++)
+        {
+            if (cell.LeftCell != null)
+            {
+                if (cell.LeftCell.tempValue >= 0)
+                {
+                    if (cell.tempValue > cell.LeftCell.tempValue)
+                    {
+                        cell = cell.LeftCell;
+                        cell.Empty = false;
+                        cell.ZoneID = zone.ZoneID;
+                        zone.Cells.Add(cell);
+
+                        if (cell.tempValue == 0)
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+            if (cell.RightCell != null)
+            {
+                if (cell.RightCell.tempValue >= 0)
+                {
+                    if (cell.tempValue > cell.RightCell.tempValue)
+                    {
+                        cell = cell.RightCell;
+                        cell.Empty = false;
+                        cell.ZoneID = zone.ZoneID;
+                        zone.Cells.Add(cell);
+
+                        if (cell.tempValue == 0)
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+            if (cell.TopCell != null)
+            {
+                if (cell.TopCell.tempValue >= 0)
+                {
+                    if (cell.tempValue > cell.TopCell.tempValue)
+                    {
+                        cell = cell.TopCell;
+                        cell.Empty = false;
+                        cell.ZoneID = zone.ZoneID;
+                        zone.Cells.Add(cell);
+
+                        if (cell.tempValue == 0)
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+            if (cell.BottomCell != null)
+            {
+                if (cell.BottomCell.tempValue >= 0)
+                {
+                    if (cell.tempValue > cell.BottomCell.tempValue)
+                    {
+                        cell = cell.BottomCell;
+                        cell.Empty = false;
+                        cell.ZoneID = zone.ZoneID;
+                        zone.Cells.Add(cell);
+
+                        if (cell.tempValue == 0)
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        ClearTempValues();
     }
 
     private void ClearWowrld()

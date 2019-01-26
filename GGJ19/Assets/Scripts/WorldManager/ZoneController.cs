@@ -7,10 +7,14 @@ public class ZoneController
     public List<CellController> Cells;
     public List<ZoneController> Neighbors;
 
+    private Color _color;
+
     public ZoneController()
     {
         Cells = new List<CellController>();
         Neighbors = new List<ZoneController>();
+
+        _color = Color.white;
     }
     
     public int Size
@@ -25,7 +29,7 @@ public class ZoneController
     {
         foreach(var cell in Cells)
         {
-            GameObject.Destroy(cell.gameObject);
+            cell.Empty = true;
         }
         Cells = null;
     }
@@ -33,10 +37,14 @@ public class ZoneController
 
     public void SetColor()
     {
-        Color color = new Color(Random.value, Random.value, Random.value);
+        if(_color == Color.white)
+        {
+            _color = new Color(Random.value, Random.value, Random.value);
+        }
+        
         foreach (var cell in Cells)
         {
-            cell.GetComponent<Renderer>().material.color = color;
+            cell.GetComponent<Renderer>().material.color = _color;
         }
     }
 }
