@@ -33,8 +33,7 @@ public class ZoneController
         }
         Cells = null;
     }
-
-
+    
     public void SetColor()
     {
         if(_color == Color.white)
@@ -45,6 +44,14 @@ public class ZoneController
         foreach (var cell in Cells)
         {
             cell.SetColor(_color);
+        }
+    }
+
+    public void SetupContent()
+    {
+        foreach(var cell in Cells)
+        {
+            cell.SetupContent();
         }
     }
 }

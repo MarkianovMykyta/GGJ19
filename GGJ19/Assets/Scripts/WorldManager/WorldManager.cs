@@ -27,7 +27,7 @@ public class WorldManager : MonoBehaviour
 
     private CellController[,] _cellsArr;
     private List<ZoneController> _zones;
-    
+
     [ContextMenu("Generate World")]
     public void GenerateWorld()
     {
@@ -83,10 +83,10 @@ public class WorldManager : MonoBehaviour
         _loadingProgress.Value = 0.6f;
 
         bool success = AllZonesConnected();
-        _loadingProgress.Value = 1f;
+        _loadingProgress.Value = 0.8f;
         if (success)
         {
-            foreach(var zone in _zones)
+            foreach (var zone in _zones)
             {
                 zone.SetColor();
             }
@@ -94,6 +94,11 @@ public class WorldManager : MonoBehaviour
             _home.Position = new Vector3(_worldSize * _cellSize / 2f, 5, _worldSize * _cellSize / 2f);
 
             _onWorldReadyEvent.Activate();
+            
+            yield return SetupContetn();
+
+            _loadingProgress.Value = 1f;
+
             Debug.Log("World Ready!");
         }
         else
@@ -182,6 +187,23 @@ public class WorldManager : MonoBehaviour
             {
                 _zones[i].DestroyZone();
                 _zones.Remove(_zones[i]);
+            }
+
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
+    private IEnumerator SetupContetn()
+    {
+        for (int x = 0; x < _worldSize; x++)
+        {
+            for (int y = 0; y < _worldSize; y++)
+            {
+                var cell = _cellsArr[x, y];
+                if (!cell.Empty)
+                {
+                    cell.SetupContent();
+                }
             }
 
             yield return new WaitForEndOfFrame();
