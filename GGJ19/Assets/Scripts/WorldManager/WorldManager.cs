@@ -18,6 +18,13 @@ public class WorldManager : MonoBehaviour
     [SerializeField]
     private CellController _cellTemplate;
 
+    [SerializeField]
+    private FloatVariable _loadingProgress;
+    [SerializeField]
+    private EventController _onWorldReadyEvent;
+    [SerializeField]
+    private Home _home;
+
     private CellController[,] _cellsArr;
     private List<ZoneController> _zones;
 
@@ -54,7 +61,6 @@ public class WorldManager : MonoBehaviour
                         _cellsArr[x, y].LeftCell = _cellsArr[x - 1, y];
                         _cellsArr[x - 1, y].RightCell = _cellsArr[x, y];
                     }
-
                 }
                 if (y > 0)
                 {
@@ -66,24 +72,39 @@ public class WorldManager : MonoBehaviour
                 }
             }
 
+            _loadingProgress.Value = 0.3f / (_worldSize - x);
             yield return new WaitForEndOfFrame();
         }
 
         yield return CreateZones();
+        _loadingProgress.Value = 0.5f;
         yield return FixZones();
-
         ConnectCollidingZones();
+        _loadingProgress.Value = 0.6f;
 
         bool success = AllZonesConnected();
+        _loadingProgress.Value = 0.8f;
         if (success)
         {
-            foreach(var zone in _zones)
+            foreach (var zone in _zones)
             {
                 zone.SetColor();
             }
-        }
 
-        Debug.Log(success);
+            _home.Position = new Vector3(_worldSize * _cellSize / 2f, 5, _worldSize * _cellSize / 2f);
+
+            _onWorldReadyEvent.Activate();
+            
+            yield return SetupContetn();
+
+            _loadingProgress.Value = 1f;
+
+            Debug.Log("World Ready!");
+        }
+        else
+        {
+            Debug.LogError("World Generation Error!");
+        }
     }
 
     private IEnumerator CreateZones()
@@ -166,6 +187,23 @@ public class WorldManager : MonoBehaviour
             {
                 _zones[i].DestroyZone();
                 _zones.Remove(_zones[i]);
+            }
+
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
+    private IEnumerator SetupContetn()
+    {
+        for (int x = 0; x < _worldSize; x++)
+        {
+            for (int y = 0; y < _worldSize; y++)
+            {
+                var cell = _cellsArr[x, y];
+                if (!cell.Empty)
+                {
+                    cell.SetupContent();
+                }
             }
 
             yield return new WaitForEndOfFrame();
