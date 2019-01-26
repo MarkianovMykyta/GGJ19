@@ -44,7 +44,7 @@ public class ZoneController
         
         foreach (var cell in Cells)
         {
-            cell.GetComponent<Renderer>().material.color = _color;
+            cell.SetColor(_color);
         }
     }
 }

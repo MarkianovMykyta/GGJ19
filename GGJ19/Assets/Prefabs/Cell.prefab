@@ -790,7 +790,7 @@ MonoBehaviour:
   RightCell: {fileID: 0}
   TopCell: {fileID: 0}
   BottomCell: {fileID: 0}
-  _navMechSurface: {fileID: 0}
+  _navMechSurface: {fileID: 4433945634158281331}
   tempValue: 0
 --- !u!114 &4433945634158281331
 MonoBehaviour:

@@ -12,6 +12,8 @@ public class CellController : MonoBehaviour
 
     [SerializeField]
     private NavMeshSurface _navMechSurface;
+    [SerializeField]
+    private Renderer _renderer;
 
     public int tempValue;
 
@@ -48,5 +50,8 @@ public class CellController : MonoBehaviour
         _navMechSurface.BuildNavMesh();
     }
 
-
+    public void SetColor(Color color)
+    {
+        _renderer.material.color = color;
+    }
 }
