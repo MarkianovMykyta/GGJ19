@@ -1552,7 +1552,7 @@ Transform:
   m_LocalScale: {x: 0.35006005, y: 2.8910499, z: 2.5174005}
   m_Children: []
   m_Father: {fileID: 1578650307}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: -91.673004, z: 0}
 --- !u!65 &80919775
 BoxCollider:
@@ -25855,8 +25855,8 @@ Transform:
   - {fileID: 1768970397}
   - {fileID: 983792245}
   - {fileID: 497633658}
-  - {fileID: 1497734491}
   - {fileID: 80919774}
+  - {fileID: 1497734491}
   - {fileID: 1843095783}
   - {fileID: 2039281126}
   - {fileID: 275487469}
@@ -33766,11 +33766,5 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -2
       objectReference: {fileID: 0}
-    - target: {fileID: 5206917884581219249, guid: bcb2d731c5a551146b20c0d995b1d72c,
-        type: 3}
-      propertyPath: m_NavMeshData
-      value: 
-      objectReference: {fileID: 23800000, guid: 9290aa22bf3c4a040bc1a5e5267a9daf,
-        type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bcb2d731c5a551146b20c0d995b1d72c, type: 3}

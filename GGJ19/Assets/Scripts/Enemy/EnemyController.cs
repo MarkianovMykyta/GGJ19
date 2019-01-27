@@ -16,11 +16,15 @@ public class EnemyController : MonoBehaviour
     private Transform _target;
     [SerializeField]
     private Rigidbody _rb;
+    [SerializeField]
+    private Animator _animator;
 
     private NavMeshAgent _agent;
 
     private float _targetSpeed;
     private float _currentSpeed;
+
+    public bool Wait;
 
     private void OnEnable()
     {
@@ -35,15 +39,20 @@ public class EnemyController : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (Wait) return;
+
         if (_rb.velocity.y < -0.1f) return;
 
         if (_target != null)
         {
             FollowAgent();
             Move();
+
+            _animator.SetBool("Move", true);
         }
         else
         {
+            _animator.SetBool("Move", false);
             StopFollowing();
         }
     }
@@ -98,6 +107,8 @@ public class EnemyController : MonoBehaviour
 
     private void Move()
     {
+        transform.LookAt(new Vector3(_agent.transform.position.x, transform.position.y, _agent.transform.position.z));
+
         var moveDir = (new Vector3(_agent.transform.position.x, transform.position.y, _agent.transform.position.z) - transform.position).normalized;
 
         _currentSpeed = Mathf.SmoothStep(_currentSpeed, _targetSpeed, 0.3f);
