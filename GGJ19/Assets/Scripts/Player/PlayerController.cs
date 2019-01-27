@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour
     private float _moveSpeed;
     [SerializeField]
     private float _mouseSenc;
+    [SerializeField]
+    private Animator _animator;
 
     private Vector3 _lookTarget;
 
@@ -21,6 +23,15 @@ public class PlayerController : MonoBehaviour
     {
         float xMove = Input.GetAxis("Horizontal");
         float zMove = Input.GetAxis("Vertical");
+
+        if(xMove == 0 && zMove == 0)
+        {
+            _animator.SetBool("Move", false);
+        }
+        else
+        {
+            _animator.SetBool("Move", true);
+        }
 
         Vector3 moveDir = new Vector3(xMove, 0, zMove).normalized;
 

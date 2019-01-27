@@ -7,6 +7,8 @@ public class Enemy : MonoBehaviour
     private float _attackDistance;
     [SerializeField]
     private EnemyController _enemyController;
+    [SerializeField]
+    private Animator _animator;
 
     private Player _player;
 
@@ -20,9 +22,19 @@ public class Enemy : MonoBehaviour
     {
         if (_player == null) return;
 
-        if(Vector3.Distance(_player.transform.position, transform.position) < _attackDistance)
+        if (Vector3.Distance(_player.transform.position, transform.position) < _attackDistance)
+        {
+            _animator.SetTrigger("Attack");
+            _enemyController.Wait = true;
+        }
+    }
+
+    public void Attack()
+    {
+        if (Vector3.Distance(_player.transform.position, transform.position) < _attackDistance)
         {
             _player.GetComponent<PlayerHealth>().Damage();
         }
+        _enemyController.Wait = false;
     }
 }
