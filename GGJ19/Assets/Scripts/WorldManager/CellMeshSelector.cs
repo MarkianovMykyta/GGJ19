@@ -26,6 +26,20 @@ public class CellMeshSelector : MonoBehaviour
     private GameObject _wallDecoration;
 
     [SerializeField]
+    private Transform _centerSpawner;
+    [SerializeField]
+    private Transform _wallSPawner;
+    [SerializeField]
+    private Transform _deadEndSpawner;
+    [SerializeField]
+    private Transform _straightWaySpawner;
+    [SerializeField]
+    private Transform _angleSpawner;
+
+    [SerializeField]
+    private Enemy _enemyPrefab;
+
+    [SerializeField]
     private GameObject _baseObj;
 
     public void SetMesh(bool top, bool bottom, bool left, bool right)
@@ -128,6 +142,7 @@ public class CellMeshSelector : MonoBehaviour
         _center.gameObject.SetActive(true);
         _center.Rotate(Vector3.forward, angle);
         _centerDecoration.SetActive(true);
+        Instantiate(_enemyPrefab, _centerSpawner.position, Quaternion.identity);
     }
 
     private void SetDeadEnd(float angle)
@@ -135,6 +150,8 @@ public class CellMeshSelector : MonoBehaviour
         _deadEnd.gameObject.SetActive(true);
         _deadEnd.Rotate(Vector3.forward, angle);
         _daedEndDecoration.SetActive(true);
+        _daedEndDecoration.transform.Rotate(Vector3.up, -angle);
+        Instantiate(_enemyPrefab, _deadEndSpawner.position, Quaternion.identity);
     }
 
     private void SetStraightWay(float angle)
@@ -142,6 +159,8 @@ public class CellMeshSelector : MonoBehaviour
         _straightWay.gameObject.SetActive(true);
         _straightWay.Rotate(Vector3.forward, angle);
         _straightWayDecoration.SetActive(true);
+        _straightWayDecoration.transform.Rotate(Vector3.up, -angle);
+        Instantiate(_enemyPrefab, _straightWaySpawner.position, Quaternion.identity);
     }
 
     private void SetAngle(float angle)
@@ -149,6 +168,8 @@ public class CellMeshSelector : MonoBehaviour
         _angle.gameObject.SetActive(true);
         _angle.Rotate(Vector3.forward, angle);
         _angleDecoration.SetActive(true);
+        _angleDecoration.transform.Rotate(Vector3.up, -angle);
+        Instantiate(_enemyPrefab, _angleSpawner.position, Quaternion.identity);
     }
 
     private void SetWall(float angle)
@@ -156,5 +177,7 @@ public class CellMeshSelector : MonoBehaviour
         _wall.gameObject.SetActive(true);
         _wall.Rotate(Vector3.forward, angle);
         _wallDecoration.SetActive(true);
+        _wallDecoration.transform.Rotate(Vector3.up, -angle);
+        Instantiate(_enemyPrefab, _wallSPawner.position, Quaternion.identity);
     }
 }

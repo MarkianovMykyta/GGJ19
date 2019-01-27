@@ -5389,6 +5389,13 @@ MonoBehaviour:
   _straightWayDecoration: {fileID: 5032571574921491366}
   _angleDecoration: {fileID: 6807231516676308763}
   _wallDecoration: {fileID: 1660794170849211627}
+  _centerSpawner: {fileID: 8467237526987828298}
+  _wallSPawner: {fileID: 4381773408876626355}
+  _deadEndSpawner: {fileID: 4768465482932162127}
+  _straightWaySpawner: {fileID: 8290249370244911004}
+  _angleSpawner: {fileID: 1061952159}
+  _enemyPrefab: {fileID: 2104534343680333904, guid: 2fb0b440941e0074696d177ef5c1694c,
+    type: 3}
   _baseObj: {fileID: 3537923842958830870}
 --- !u!114 &5206917884581219249
 MonoBehaviour:
@@ -5418,7 +5425,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_BuildHeightMesh: 0
-  m_NavMeshData: {fileID: 0}
+  m_NavMeshData: {fileID: 23800000, guid: 9290aa22bf3c4a040bc1a5e5267a9daf, type: 2}
 --- !u!114 &197569469862062484
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5738,7 +5745,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4020397207534914151
 Transform:
   m_ObjectHideFlags: 0
@@ -15395,6 +15402,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 395528898242842562}
     m_Modifications:
+    - target: {fileID: 4979665231597896720, guid: d5e3f7a628adf344e80a80801be9ced4,
+        type: 3}
+      propertyPath: m_Name
+      value: Angle
+      objectReference: {fileID: 0}
+    - target: {fileID: 4979665231597896720, guid: d5e3f7a628adf344e80a80801be9ced4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4979665231598196784, guid: d5e3f7a628adf344e80a80801be9ced4,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -15448,16 +15465,6 @@ PrefabInstance:
     - target: {fileID: 4979665231598196784, guid: d5e3f7a628adf344e80a80801be9ced4,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4979665231597896720, guid: d5e3f7a628adf344e80a80801be9ced4,
-        type: 3}
-      propertyPath: m_Name
-      value: Angle
-      objectReference: {fileID: 0}
-    - target: {fileID: 4979665231597896720, guid: d5e3f7a628adf344e80a80801be9ced4,
-        type: 3}
-      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4979665231600098002, guid: d5e3f7a628adf344e80a80801be9ced4,
