@@ -65,5 +65,7 @@ public class CellController : MonoBehaviour
         bool right = RightCell != null && !RightCell.Empty;
 
         _meshSelector.SetMesh(top, bottom, left, right);
+
+        _navMechSurface.BuildNavMesh();
     }
 }

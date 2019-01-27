@@ -243,6 +243,11 @@ MonoBehaviour:
   _straightWay: {fileID: 7562762240566542632}
   _angle: {fileID: 53378927818725145}
   _wall: {fileID: 4154248696189689408}
+  _centerDecoration: {fileID: 5574698449176562469}
+  _daedEndDecoration: {fileID: 3093538800441925426}
+  _straightWayDecoration: {fileID: 5032571574921491366}
+  _angleDecoration: {fileID: 6807231516676308763}
+  _wallDecoration: {fileID: 1660794170849211627}
   _baseObj: {fileID: 3537923842958830870}
 --- !u!114 &5206917884581219249
 MonoBehaviour:
@@ -262,7 +267,7 @@ MonoBehaviour:
   m_Center: {x: 0, y: 2, z: 0}
   m_LayerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1
   m_UseGeometry: 1
   m_DefaultArea: 0
   m_IgnoreNavMeshAgent: 1
